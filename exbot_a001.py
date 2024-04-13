@@ -26,4 +26,4 @@ async def on_message(message):
 async def hello(interaction: discord.Interaction, text1:str, text2:int):    # 출력
     await interaction.response.send_message(f'{interaction.user.mention} : {text1} : {text2}', ephemeral=True)
 
-client.run('MTIyMTA2MDQ2ODg4MjUzODU4Nw.G1scZX.iNikqjR8bI5H8sW1GqHoDIcI6Gd0NMGltKro2g')
+client.run('censored')
