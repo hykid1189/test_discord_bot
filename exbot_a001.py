@@ -1,29 +1,45 @@
-# This example requires the 'message_content' intent.
-
 import discord
-from discord import app_commands
-from discord.app_commands import *
+import socket
 from discord.ext import commands
-
 intents = discord.Intents.default()
 intents.message_content = True
-client = commands.Bot(command_prefix="/", intents=intents)
+bot = commands.Bot(command_prefix='/', intents=intents)
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-@client.event
+server_address = ('localhost', 9999)
+print('Start up on {} port {}'.format(*server_address))
+
+while True:
+    print('accept wait')
+    # 클라이언트 접속 대기
+    client_socket, client_address = server_socket.accept()
+
+    try:
+        # 클라이언트가 보낸 데이터 수령(1024byte)
+        data = client_socket.recv(1024)
+        # 문자열 치환
+        data = data.decode()
+    except Exception as err:  # 예외 발생 시
+        # 클라이언트 소켓 연결 끊기
+        client_socket.close()
+        break
+    finally:  # 모든 작업이 종료
+        client_socket.close()
+        break
+
+@bot.event
 async def on_ready():
-    print(f'We have logged in as {client.user}')
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+@bot.command()
+async def ping(ctx):
+    await ctx.send('pong')
 
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
+@bot.command()
+async def AK47(ctx):
+    await ctx.send('AK47! AK47!')
 
-@client.tree.command(name='hello', description='testing')  # 명령어 이름, 설명
-@app_commands.describe(text1='쓸 내용', text2 = '번호') # 같이 쓸 내용들
-async def hello(interaction: discord.Interaction, text1:str, text2:int):    # 출력
-    await interaction.response.send_message(f'{interaction.user.mention} : {text1} : {text2}', ephemeral=True)
-
-client.run('censored')
+bot.run('')
